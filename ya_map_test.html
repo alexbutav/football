@@ -5,26 +5,42 @@
         <script src="https://api-maps.yandex.ru/2.1/?apikey=eb7b7344-1b0d-430d-b9d2-211ffbda9429&lang=ru_RU"
                 type="text/javascript"></script>
         <script>
-            var location = ymaps.geolocation.get();
-            location
-            .then((result) => {
-                console.log(result);
-            })
-            .catch((err) => console.log(err));
-
-
+            // API готовы
             ymaps.ready(function () {
-                var map = new ymaps.Map('map', {
-                    center: [55.7, 37.6],
-                    zoom: 14
-                });
-                // ...
-            }).then( (result) => console.log(result) );
+                var placemark;
+
+                // определяем геопозицию клиента
+                ymaps.geolocation.get()
+                .then((result) => {
+                    var map = new ymaps.Map('map', {
+                        center: result.geoObjects.position,
+                        zoom: 14
+                    });
+
+                    // устанавливаем курсор стрелкой
+                    map.cursors.push('arrow');
+
+                    map.events.add('click', function (e) {
+                        // Получение координат щелчка
+                        let coords = e.get('coords');
+
+                        if(placemark === undefined) {
+                            placemark = new ymaps.Placemark(coords);
+                            map.geoObjects.add( placemark );
+                        } else {
+                            placemark.geometry.setCoordinates(coords);
+                        }
+                    });
+                })
+                .catch((err) => console.log(err));
+            });
+
+            //map.geoObjects.add( new ymaps.Placemark([55.684758, 37.738521]) );
         </script>
     </head>
     <body>
         <style>
-        
+            #map { cursor: default; }
         </style>
         <div id="map" style="width: 500px; height: 500px;"><div>
     </body>
