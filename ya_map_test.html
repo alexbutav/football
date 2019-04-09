@@ -16,14 +16,30 @@
                         center: result.geoObjects.position,
                         zoom: 14
                     });
-
+                    
                     // устанавливаем курсор стрелкой
                     map.cursors.push('arrow');
 
+                    // тут мы должны загрузить все
+                    // существующие коробки
+
+
+                    // события при клике
                     map.events.add('click', function (e) {
                         // Получение координат щелчка
                         let coords = e.get('coords');
 
+                        console.log(coords);
+
+                        // прежде чем перемещать метку
+                        // необходимо определить не конфликтует ли она с другими
+
+                        // для этого с помощью API выбираем все метки в радиусе
+                        // и смотрим расстояние до них
+                        // если меньше какой-нибудь min_delta
+                        // то не разрешаем ставить метку, т.к. уже есть
+
+                        // перемещение  метки
                         if(placemark === undefined) {
                             placemark = new ymaps.Placemark(coords);
                             map.geoObjects.add( placemark );
