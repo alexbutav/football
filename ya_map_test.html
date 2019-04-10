@@ -12,7 +12,7 @@
                 // определяем геопозицию клиента
                 ymaps.geolocation.get()
                 .then((result) => {
-                    var map = new ymaps.Map('map', {
+                    window.map = new ymaps.Map('map', {
                         center: result.geoObjects.position,
                         zoom: 14
                     });
@@ -22,6 +22,7 @@
 
                     // тут мы должны загрузить все
                     // существующие коробки
+
 
 
                     // события при клике
@@ -39,6 +40,9 @@
                         // если меньше какой-нибудь min_delta
                         // то не разрешаем ставить метку, т.к. уже есть
 
+                        // ymaps.coordSystem.geo.getDistance(p1, p2);
+                        // возвращает расстояние между точками в метрах
+
                         // перемещение  метки
                         if(placemark === undefined) {
                             placemark = new ymaps.Placemark(coords);
@@ -46,10 +50,42 @@
                         } else {
                             placemark.geometry.setCoordinates(coords);
                         }
+
+                        // добавляем случайные метки вокруг
+                        for(let i = 0; i < 7; i++) {
+                            let newX = coords[0] - 0.005 + 0.01*Math.random();
+                            let newY = coords[1] - 0.005 + 0.01*Math.random();
+                            map.geoObjects.add( new ymaps.Placemark([newX, newY]) );
+                        }
                     });
                 })
                 .catch((err) => console.log(err));
             });
+
+            function addField() {
+                if(window.myPolygon !== undefined) {
+                    map.geoObjects.remove(window.myPolygon);
+                }
+                // Создаем многоугольник без вершин.
+                window.myPolygon = new ymaps.Polygon([], {}, {
+                    // Курсор в режиме добавления новых вершин.
+                    editorDrawingCursor: "crosshair",
+                    // Максимально допустимое количество вершин.
+                    editorMaxPoints: 5,
+                    // Цвет заливки.
+                    fillColor: 'rgba(46, 204, 64, 0.5)',
+                    // Цвет обводки.
+                    strokeColor: '#111111',
+                    // Ширина обводки.
+                    strokeWidth: 2
+                });
+                // Добавляем многоугольник на карту.
+                map.geoObjects.add(myPolygon);
+
+
+                // Включаем режим редактирования с возможностью добавления новых вершин.
+                myPolygon.editor.startDrawing();
+            }
 
             //map.geoObjects.add( new ymaps.Placemark([55.684758, 37.738521]) );
         </script>
@@ -59,5 +95,8 @@
             #map { cursor: default; }
         </style>
         <div id="map" style="width: 500px; height: 500px;"><div>
+
+        <button>Выбор поля</button>
+        <button onclick='addField()'>Добавить поле</button>
     </body>
 </html
