@@ -5,6 +5,9 @@
         <script src="https://api-maps.yandex.ru/2.1/?apikey=eb7b7344-1b0d-430d-b9d2-211ffbda9429&lang=ru_RU"
                 type="text/javascript"></script>
         <script>
+
+            var _fields = [];
+
             // API готовы
             ymaps.ready(function () {
                 var placemark;
@@ -27,6 +30,8 @@
 
                     // события при клике
                     map.events.add('click', function (e) {
+                        return;
+
                         // Получение координат щелчка
                         let coords = e.get('coords');
 
@@ -63,11 +68,8 @@
             });
 
             function addField() {
-                if(window.myPolygon !== undefined) {
-                    map.geoObjects.remove(window.myPolygon);
-                }
                 // Создаем многоугольник без вершин.
-                window.myPolygon = new ymaps.Polygon([], {}, {
+                let myPolygon = new ymaps.Polygon([], {}, {
                     // Курсор в режиме добавления новых вершин.
                     editorDrawingCursor: "crosshair",
                     // Максимально допустимое количество вершин.
@@ -77,11 +79,30 @@
                     // Цвет обводки.
                     strokeColor: '#111111',
                     // Ширина обводки.
-                    strokeWidth: 2
+                    strokeWidth: 2,
+                    draggable: true
                 });
+
+                myPolygon.events.add("geometrychange", (e) => {
+
+                    try {
+                        var intersected = ymaps.geoQuery(_fields).searchIntersect(e.get("target"));
+                        //console.log(intersected.getLength());
+                        intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
+                    } catch(e) {
+                        console.log(e);
+                    }
+
+                    // if(intersected.getLength()) {
+                    //     intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
+                    // }
+                });
+
                 // Добавляем многоугольник на карту.
                 map.geoObjects.add(myPolygon);
 
+                // добавляем многоугольник в коллекцию
+                _fields.push(myPolygon);
 
                 // Включаем режим редактирования с возможностью добавления новых вершин.
                 myPolygon.editor.startDrawing();
