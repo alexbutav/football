@@ -8,16 +8,22 @@
 
             var _fields = [];
 
+            var vertices = [
+                [55.80666815438335, 37.75769110885906],
+                [55.80694912038786, 37.758887374079684],
+                [55.80667419668443, 37.759128772891025],
+                [55.806353953428605, 37.75795396534251]
+            ];
+
             // API готовы
             ymaps.ready(function () {
                 var placemark;
 
-                // определяем геопозицию клиента
-                ymaps.geolocation.get()
-                .then((result) => {
-                    window.map = new ymaps.Map('map', {
-                        center: result.geoObjects.position,
-                        zoom: 14
+                
+                window.map = new ymaps.Map('map', {
+                        // center: result.geoObjects.position,
+                        center: [55.806616794792376, 37.75859769550608],
+                        zoom: 16
                     });
                     
                     // устанавливаем курсор стрелкой
@@ -30,12 +36,10 @@
 
                     // события при клике
                     map.events.add('click', function (e) {
-                        return;
-
                         // Получение координат щелчка
                         let coords = e.get('coords');
-
                         console.log(coords);
+                        return;
 
                         // прежде чем перемещать метку
                         // необходимо определить не конфликтует ли она с другими
@@ -63,8 +67,33 @@
                             map.geoObjects.add( new ymaps.Placemark([newX, newY]) );
                         }
                     });
-                })
-                .catch((err) => console.log(err));
+
+                    window.p = new ymaps.Polygon([vertices], {}, {
+                        // Цвет заливки.
+                        fillColor: 'rgba(46, 204, 64, 0.5)',
+                        // Цвет обводки.
+                        strokeColor: '#111111',
+                        // Ширина обводки.
+                        strokeWidth: 2,
+                        draggable: true
+                    });
+
+                    console.log(p);
+                    map.geoObjects.add( p );
+
+
+                // определяем геопозицию клиента
+                if(localStorage.getItem("geolocation")) {
+                    window.geolocation = JSON.parse(localStorage.getItem("geolocation"));
+                    console.log(geolocation);
+                } else {
+                    ymaps.geolocation.get()
+                    .then((result) => {
+                        console.log(result);
+                        localStorage.setItem("geolocation", JSON.stringify(result.geoObjects.position));
+                    })
+                    .catch((err) => console.log(err));
+                }
             });
 
             function addField() {
@@ -84,6 +113,7 @@
                 });
 
                 myPolygon.events.add("geometrychange", (e) => {
+                    window.t = e.get("target").geometry.getCoordinates();
 
                     try {
                         var intersected = ymaps.geoQuery(_fields).searchIntersect(e.get("target"));
