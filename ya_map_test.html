@@ -36,10 +36,11 @@
 
                     // события при клике
                     map.events.add('click', function (e) {
+                        return;
+                        
                         // Получение координат щелчка
                         let coords = e.get('coords');
                         console.log(coords);
-                        return;
 
                         // прежде чем перемещать метку
                         // необходимо определить не конфликтует ли она с другими
@@ -68,7 +69,7 @@
                         }
                     });
 
-                    window.p = new ymaps.Polygon([vertices], {}, {
+                    let p = new ymaps.Polygon([vertices], {}, {
                         // Цвет заливки.
                         fillColor: 'rgba(46, 204, 64, 0.5)',
                         // Цвет обводки.
@@ -78,14 +79,14 @@
                         draggable: true
                     });
 
-                    console.log(p);
-                    map.geoObjects.add( p );
+                    map.geoObjects.add(p);
+                    _fields.push(p);
 
 
                 // определяем геопозицию клиента
                 if(localStorage.getItem("geolocation")) {
                     window.geolocation = JSON.parse(localStorage.getItem("geolocation"));
-                    console.log(geolocation);
+                    console.log("geolocation", geolocation);
                 } else {
                     ymaps.geolocation.get()
                     .then((result) => {
@@ -113,19 +114,31 @@
                 });
 
                 myPolygon.events.add("geometrychange", (e) => {
-                    window.t = e.get("target").geometry.getCoordinates();
-
-                    try {
-                        var intersected = ymaps.geoQuery(_fields).searchIntersect(e.get("target"));
-                        //console.log(intersected.getLength());
-                        intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
-                    } catch(e) {
-                        console.log(e);
+                    console.clear();
+                    console.log(1);
+                    let target = e.get("target");
+                    // если количество координат больше 1ух
+                    if( target.geometry.getCoordinates()[0].length > 1 ) {
+                        console.log(2);
+                        try {
+                            let geoQueryResult = ymaps.geoQuery(_fields);
+                            let intersected = geoQueryResult.searchIntersect(target);
+                            console.log("target", target);
+                            console.log("fields", _fields);
+                            console.log("geoQueryResult", geoQueryResult);
+                            if(intersected.getLength()) {
+                                console.log(3);
+                                target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
+                                //console.log(intersected.getLength());
+                                //intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
+                            } else {
+                                console.log(4);
+                                target.options.set("fillColor", "rgba(46, 204, 64, 0.5)");
+                            }
+                        } catch(err) {
+                            console.log(err);
+                        }
                     }
-
-                    // if(intersected.getLength()) {
-                    //     intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
-                    // }
                 });
 
                 // Добавляем многоугольник на карту.
