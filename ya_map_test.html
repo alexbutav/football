@@ -114,38 +114,42 @@
                 });
 
                 myPolygon.events.add("geometrychange", (e) => {
-                    console.clear();
-                    console.log(1);
-                    let target = e.get("target");
-                    // если количество координат больше 1ух
-                    if( target.geometry.getCoordinates()[0].length > 1 ) {
-                        console.log(2);
-                        try {
-                            let geoQueryResult = ymaps.geoQuery(_fields);
-                            let intersected = geoQueryResult.searchIntersect(target);
-                            console.log("target", target);
-                            console.log("fields", _fields);
-                            console.log("geoQueryResult", geoQueryResult);
-                            if(intersected.getLength()) {
-                                console.log(3);
-                                target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
-                                //console.log(intersected.getLength());
-                                //intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
-                            } else {
-                                console.log(4);
-                                target.options.set("fillColor", "rgba(46, 204, 64, 0.5)");
+                    setTimeout(function() {
+                        console.clear();
+                        console.log(1);
+                        let target = e.get("target");
+                        // если количество координат больше 1ух
+                        if( target.geometry.getCoordinates()[0].length > 1 ) {
+                            console.log(2);
+                            try {
+                                let geoQueryResult = ymaps.geoQuery(_fields);
+                                let intersected = geoQueryResult.searchIntersect(target);
+                                console.log("target", target);
+                                console.log("fields", _fields);
+                                console.log("geoQueryResult", geoQueryResult);
+                                console.log("intersected", intersected);
+                                if(intersected.getLength()) {
+                                    console.log("RED");
+                                    target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
+                                    //console.log(intersected.getLength());
+                                    //intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
+                                } else {
+                                    console.log("GREEN");
+                                    target.options.set("fillColor", "rgba(46, 204, 64, 0.5)");
+                                }
+                            } catch(err) {
+                                console.log(err);
                             }
-                        } catch(err) {
-                            console.log(err);
                         }
-                    }
+
+                    });
                 });
 
                 // Добавляем многоугольник на карту.
                 map.geoObjects.add(myPolygon);
 
                 // добавляем многоугольник в коллекцию
-                _fields.push(myPolygon);
+                //_fields.push(myPolygon);
 
                 // Включаем режим редактирования с возможностью добавления новых вершин.
                 myPolygon.editor.startDrawing();
