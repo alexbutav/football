@@ -4,6 +4,7 @@
         <meta charset="utf-8" />
         <script src="https://api-maps.yandex.ru/2.1/?apikey=eb7b7344-1b0d-430d-b9d2-211ffbda9429&lang=ru_RU"
                 type="text/javascript"></script>
+        <script src="https://yastatic.net/s3/mapsapi-jslibs/area/0.0.1/util.calculateArea.min.js" type="text/javascript"></script>
         <script>
 
             var _fields = [];
@@ -16,10 +17,10 @@
             ];
 
             // API готовы
-            ymaps.ready(function () {
+            ymaps.ready(['util.calculateArea']).then(function () {
+
                 var placemark;
 
-                
                 window.map = new ymaps.Map('map', {
                         // center: result.geoObjects.position,
                         center: [55.806616794792376, 37.75859769550608],
@@ -82,6 +83,15 @@
                     map.geoObjects.add(p);
                     _fields.push(p);
 
+                    
+                    // let coordinates = p.geometry.getCoordinates()[0];
+                    // console.log(coordinates.length);
+                    // for(let i = 0; i < coordinates.length - 1; i++) {
+                    //     console.log(i);
+                    //     let p1 = coordinates[i];
+                    //     let p2 = coordinates[i + 1];
+                    //     console.log(`сторона ${i + 1}`, ymaps.coordSystem.geo.getDistance(p1, p2));
+                    // }
 
                 // определяем геопозицию клиента
                 if(localStorage.getItem("geolocation")) {
@@ -104,8 +114,12 @@
                     editorDrawingCursor: "crosshair",
                     // Максимально допустимое количество вершин.
                     editorMaxPoints: 5,
+                    fillImageHref: 'rubber.png',
+                    // Тип заливки фоном.
+                    fillMethod: 'tile',
+                    opacity: 0.5,
                     // Цвет заливки.
-                    fillColor: 'rgba(46, 204, 64, 0.5)',
+                    // fillColor: 'rgba(46, 204, 64, 0.5)',
                     // Цвет обводки.
                     strokeColor: '#111111',
                     // Ширина обводки.
@@ -115,27 +129,25 @@
 
                 myPolygon.events.add("geometrychange", (e) => {
                     setTimeout(function() {
-                        console.clear();
-                        console.log(1);
                         let target = e.get("target");
                         // если количество координат больше 1ух
                         if( target.geometry.getCoordinates()[0].length > 1 ) {
-                            console.log(2);
                             try {
                                 let geoQueryResult = ymaps.geoQuery(_fields);
                                 let intersected = geoQueryResult.searchIntersect(target);
-                                console.log("target", target);
-                                console.log("fields", _fields);
-                                console.log("geoQueryResult", geoQueryResult);
-                                console.log("intersected", intersected);
                                 if(intersected.getLength()) {
-                                    console.log("RED");
                                     target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
-                                    //console.log(intersected.getLength());
-                                    //intersected.setOptions('fillColor', 'rgba(255, 65, 54, 0.5)');
                                 } else {
-                                    console.log("GREEN");
-                                    target.options.set("fillColor", "rgba(46, 204, 64, 0.5)");
+                                    let area = Math.round(ymaps.util.calculateArea(target));
+                                    if(area > 12000) {
+                                        console.log("Area", area);
+                                        target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
+                                    } else if(area < 100) {
+                                        console.log("Area", area);
+                                        target.options.set("fillColor", "rgba(255, 65, 54, 0.5)");
+                                    } else {
+                                        target.options.set("fillColor", "rgba(46, 204, 64, 0.5)");
+                                    }
                                 }
                             } catch(err) {
                                 console.log(err);
@@ -163,8 +175,6 @@
             #map { cursor: default; }
         </style>
         <div id="map" style="width: 500px; height: 500px;"><div>
-
-        <button>Выбор поля</button>
         <button onclick='addField()'>Добавить поле</button>
     </body>
 </html
