@@ -1,0 +1,28 @@
+body, html{ margin: 0; padding: 0; }
+body { 
+    background: no-repeat radial-gradient(#6DEB7B, #2ECC40); 
+    background-size: 100% 100%;
+    background-position: center center;
+    min-height: 100vh;
+    font-family: 'Open Sans', sans-serif;
+}
+
+@media( min-width: 720px ) {
+    header {
+        width: 100%;
+        background: #fff;
+        height: 100px;
+    }
+    main {
+        width: 70%;
+        max-width: 1024px;
+        margin: 0 auto;
+        background: #fff;
+        min-height: 100vh;
+        color: white;
+    }
+}
+
+@media( max-width: 720px ) {
+
+}
