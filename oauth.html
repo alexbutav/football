@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <iframe id="login_frame"></iframe>
+        <button id="login_button">Войти с помощью ВКонтакте</button>
+    </body>
+    <script>
+        // https://oauth.vk.com/authorize?client_id=6952598&redirect_uri=http://football-sng.ru/auth/vk&display=popup&response_type=code&v=5.95
+        console.log(login_frame);
+        console.log(login_button);
+
+        login_button.addEventListener("click", loginVk);
+
+
+        // https://vk.com/dev/access_token 
+        // https://vk.com/dev/authcode_flow_user
+        // https://vk.com/dev/account.getProfileInfo?params[v]=5.95
+        // 
+
+        function loginVk() {
+            // https://oauth.vk.com/authorize?
+                // client_id=6952598
+                // &redirect_uri=http://football-sng.ru/auth/vk
+                // &display=popup
+                // &response_type=code
+                // &v=5.95
+        }
+    </script>
+</html>
